@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -20,20 +20,18 @@ func main() {
 	flag.Parse()
 
 	cfg := &packages.Config{
-		Mode:  packages.NeedFiles | packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo,
+		Mode:  packages.NeedName | packages.NeedFiles | packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo,
 		Tests: true,
 	}
 	pkgs, err := packages.Load(cfg, flag.Args()...)
 	if err != nil {
-		log.Printf("load: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("load: %v\n", err)
 	}
-	if packages.PrintErrors(pkgs) > 0 {
-		os.Exit(1)
-	}
+	// Errors could be stored in pkg.Errors, but we can ignore them fow now.
 
 	for _, pkg := range pkgs {
 		for _, file := range pkg.GoFiles {
+			log.Printf("read file: %s", file)
 			content, err := ioutil.ReadFile(file)
 			if err != nil {
 				log.Fatalf("read file %s: %v", file, err)
@@ -44,14 +42,88 @@ func main() {
 				log.Fatalf("parse file %s: %v", file, err)
 			}
 
+			var sts []structType
+
 			for _, v := range f.Decls {
-				parse(v)
+				sts = append(sts, parse(v)...)
+			}
+
+			var generateFile io.Writer
+
+			if len(sts) == 0 {
+				continue
+			}
+
+			generateFile, err = os.OpenFile(
+				fmt.Sprintf(formatGeneratedFilename(file)),
+				os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				log.Fatalf("open file: %v", err)
+			}
+
+			err = packageTmpl.Execute(generateFile, pkg.Name)
+			if err != nil {
+				log.Fatalf("pacakge tmpl execute: %v", err)
+			}
+
+			for _, v := range sts {
+				generate(generateFile, v)
 			}
 		}
 	}
 }
 
-func parse(decl ast.Decl) {
+type structType struct {
+	Name   string
+	Fields []structFiled
+	Flags  map[string]bool
+
+	comments *ast.CommentGroup
+	decl     *ast.StructType
+}
+
+func (s *structType) Parse() error {
+	// Parse struct Flags
+	s.Flags = map[string]bool{}
+	for _, comment := range s.comments.List {
+		if !strings.HasPrefix(comment.Text, SerdePrefix) {
+			continue
+		}
+		text := strings.TrimPrefix(comment.Text, SerdePrefix)
+
+		for _, v := range strings.Split(text, ",") {
+			s.Flags[strings.Trim(v, " ")] = true
+		}
+	}
+
+	// Parse fields.
+	for _, v := range s.decl.Fields.List {
+		for _, name := range v.Names {
+			f := structFiled{Name: name.Name}
+
+			switch ty := v.Type.(type) {
+			case *ast.Ident:
+				f.Type = ty.Name
+			default:
+				log.Printf("struct %s field %s %+v is not supported for now", s.Name, f.Name, ty)
+				continue
+			}
+
+			s.Fields = append(s.Fields, f)
+		}
+	}
+
+	return nil
+}
+
+type structFiled struct {
+	Name string
+	Type string
+}
+
+func parse(decl ast.Decl) []structType {
+	var sts []structType
+
 	ast.Inspect(decl, func(node ast.Node) bool {
 		decl, ok := node.(*ast.GenDecl)
 		if !ok {
@@ -66,58 +138,51 @@ func parse(decl ast.Decl) {
 			return true
 		}
 		// Only handle struct type.
-		typeSpec := decl.Specs[0].(*ast.TypeSpec)
+		typeSpec, ok := decl.Specs[0].(*ast.TypeSpec)
+		if !ok {
+			log.Printf("%+v is not supported for now", decl.Specs[0])
+			return false
+		}
 		st, ok := typeSpec.Type.(*ast.StructType)
 		if !ok {
 			return true
 		}
 
-		generate(typeSpec.Name.Name, decl.Doc, st)
+		s := structType{
+			Name:     typeSpec.Name.Name,
+			Fields:   nil,
+			comments: decl.Doc,
+			decl:     st,
+		}
+		err := s.Parse()
+		if err != nil {
+			log.Fatalf("struct %v parse: %v", s.Name, err)
+		}
+
+		if len(s.Flags) > 0 {
+			sts = append(sts, s)
+		}
 		return true
 	})
+
+	return sts
 }
 
 const SerdePrefix = "// serde:"
 
-func generate(name string, comments *ast.CommentGroup, decl *ast.StructType) {
-	var structFlag = map[string]bool{
-		"Serialize":   false,
-		"Deserialize": false,
-	}
-	for _, comment := range comments.List {
-		if !strings.HasPrefix(comment.Text, SerdePrefix) {
-			continue
-		}
-		text := strings.TrimPrefix(comment.Text, SerdePrefix)
-
-		for _, v := range strings.Split(text, ",") {
-			v = strings.Trim(v, " ")
-			if _, ok := structFlag[v]; ok {
-				structFlag[v] = true
-			}
-		}
-	}
-
-	if structFlag["Serialize"] {
+func generate(w io.Writer, st structType) {
+	if st.Flags["Serialize"] {
+		log.Printf("generate serialize for %s", st.Name)
 		generateSerialize()
 	}
 
-	if structFlag["Deserialize"] {
-		generateDeserialize(name, decl.Fields.List)
+	if st.Flags["Deserialize"] {
+		log.Printf("generate deserialize for %s", st.Name)
+		generateDeserialize(w, st)
 	}
 }
 
 func generateSerialize() {}
-
-type structType struct {
-	Name   string
-	Fields []structFiled
-}
-
-type structFiled struct {
-	Name string
-	Type string
-}
 
 func (f *structFiled) Visitor() string {
 	switch f.Type {
@@ -130,38 +195,29 @@ func (f *structFiled) Visitor() string {
 	}
 }
 
-func generateDeserialize(name string, fields []*ast.Field) {
-	var content bytes.Buffer
-
-	st := structType{Name: name}
-
-	for _, v := range fields {
-		for _, name := range v.Names {
-			st.Fields = append(st.Fields, structFiled{
-				Name: name.Name,
-				Type: v.Type.(*ast.Ident).Name,
-			})
-		}
-	}
-
-	// Generate struct enums
-	err := deTmpl.Execute(&content, st)
+func generateDeserialize(w io.Writer, st structType) {
+	err := deTmpl.Execute(w, st)
 	if err != nil {
 		log.Fatalf("de tmpl execute: %v", err)
 	}
-
-	// Generate struct filed visitor
-	// Generate struct value visitor
-
-	log.Print(content.String())
 }
+
+var packageTmpl = template.Must(template.New("package").Parse(`
+package {{ . }}
+
+import (
+	"errors"
+
+	"github.com/Xuanwo/serde-go"
+)
+`))
 
 var deTmpl = template.Must(template.New("de").Parse(`
 type serde{{ $.Name }}Enum = int
 
 const (
 {{- range $idx, $field := .Fields }}
-	serde{{ $.Name }}Enum{{ $field.Name }} {{ if eq $idx 0 }} serde{{ $.Name }}Enum = itoa + 1 {{ end }}
+	serde{{ $.Name }}Enum{{ $field.Name }} {{ if eq $idx 0 }} serde{{ $.Name }}Enum = iota + 1 {{ end }}
 {{- end }}
 )
 
