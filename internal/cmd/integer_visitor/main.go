@@ -25,7 +25,6 @@ func (i *Integer) IsUint() bool {
 }
 
 var Integers = []Integer{
-
 	{"int8", 1},
 	{"uint8", 2},
 	{"int16", 3},
@@ -39,7 +38,7 @@ var Integers = []Integer{
 }
 
 func main() {
-	f, err := os.OpenFile("visitor_integer.go", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
+	f, err := os.OpenFile("de_primitive_integer.go", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Fatalf("open file: %v", err)
 	}
@@ -62,37 +61,37 @@ import (
 {{ $name := $v.Name }}
 type {{$name}}Visitor struct {
 	v *{{$type}}
-
-	DummyVisitor
 }
 
 func New{{$name}}Visitor(v *{{$type}}) {{$name}}Visitor {
 	return {{$name}}Visitor{v: v}
 }
 
+func (vi {{$name}}Visitor) String() string {
+	return "{{$name}}"
+}
 
-
-func (s {{$name}}Visitor) VisitInt8(v int8) (err error) {
+func (vi {{$name}}Visitor) VisitInt8(v int8) (err error) {
 	{{- if $v.IsUint }}
 	if v < Min{{$name}} {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitUint8(v uint8) (err error) {
+func (vi {{$name}}Visitor) VisitUint8(v uint8) (err error) {
 	{{- if lt $v.Size 2 }}
 	if v > Max{{$name}} {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitInt16(v int16) (err error) {
+func (vi {{$name}}Visitor) VisitInt16(v int16) (err error) {
 	{{- if lt $v.Size 3 }}
 	if v > Max{{$name}} {
 		return errors.New("overflow")
@@ -103,21 +102,21 @@ func (s {{$name}}Visitor) VisitInt16(v int16) (err error) {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitUint16(v uint16) (err error) {
+func (vi {{$name}}Visitor) VisitUint16(v uint16) (err error) {
 	{{- if lt $v.Size 4 }}
 	if v > Max{{$name}} {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitInt32(v int32) (err error) {
+func (vi {{$name}}Visitor) VisitInt32(v int32) (err error) {
 	{{- if lt $v.Size 5 }}
 	if v > Max{{$name}} {
 		return errors.New("overflow")
@@ -128,11 +127,11 @@ func (s {{$name}}Visitor) VisitInt32(v int32) (err error) {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitInt(v int) (err error) {
+func (vi {{$name}}Visitor) VisitInt(v int) (err error) {
 	{{- if lt $v.Size 6 }}
 	if v > Max{{$name}} {
 		return errors.New("overflow")
@@ -143,11 +142,11 @@ func (s {{$name}}Visitor) VisitInt(v int) (err error) {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitUint32(v uint32) (err error) {
+func (vi {{$name}}Visitor) VisitUint32(v uint32) (err error) {
 	{{- if eq $v.Size 6 }}
 	if UintSize == 32 && v > MaxInt32 {
 		return errors.New("overflow")
@@ -157,21 +156,21 @@ func (s {{$name}}Visitor) VisitUint32(v uint32) (err error) {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitUint(v uint) (err error) {
+func (vi {{$name}}Visitor) VisitUint(v uint) (err error) {
 	{{- if lt $v.Size 8 }}
 	if v > Max{{$name}} {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitInt64(v int64) (err error) {
+func (vi {{$name}}Visitor) VisitInt64(v int64) (err error) {
 	{{- if eq $v.Size 8 }}
 	if UintSize == 32 && v > MaxUint32 {
 		return errors.New("overflow")
@@ -186,17 +185,17 @@ func (s {{$name}}Visitor) VisitInt64(v int64) (err error) {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 
-func (s {{$name}}Visitor) VisitUint64(v uint64) (err error) {
+func (vi {{$name}}Visitor) VisitUint64(v uint64) (err error) {
 	{{- if lt $v.Size 10 }}
 	if v > Max{{$name}} {
 		return errors.New("overflow")
 	}
 	{{- end }}
-	*s.v = {{$type}}(v)
+	*vi.v = {{$type}}(v)
 	return nil
 }
 {{ end }}
