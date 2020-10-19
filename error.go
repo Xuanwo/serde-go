@@ -177,6 +177,13 @@ func (e *ErrInvalidValue) Error() string {
 	return fmt.Sprintf("invalid value: %s, expected %s", e.unexpected.unexpected(), e.expected)
 }
 
+func NewErrInvalidValue(unexpected Unexpected, expected fmt.Stringer) *ErrInvalidValue {
+	return &ErrInvalidValue{
+		unexpected: unexpected,
+		expected:   expected,
+	}
+}
+
 type ErrInvalidLength struct {
 	length   uint
 	expected fmt.Stringer
@@ -186,6 +193,13 @@ func (e *ErrInvalidLength) Error() string {
 	return fmt.Sprintf("invalid length: %d, expected %s", e.length, e.expected)
 }
 
+func NewErrInvalidLength(length uint, expected fmt.Stringer) *ErrInvalidLength {
+	return &ErrInvalidLength{
+		length:   length,
+		expected: expected,
+	}
+}
+
 type ErrUnknownField struct {
 	field    string
 	expected []string
@@ -193,6 +207,13 @@ type ErrUnknownField struct {
 
 func (e *ErrUnknownField) Error() string {
 	return fmt.Sprintf("unknown field `%s`, expected %s", e.field, oneOfFields(e.expected))
+}
+
+func NewErrUnknownField(field string, expected []string) *ErrUnknownField {
+	return &ErrUnknownField{
+		field:    field,
+		expected: expected,
+	}
 }
 
 type oneOfFields []string
@@ -228,10 +249,22 @@ func (e *ErrMissingField) Error() string {
 	return fmt.Sprintf("missing field `%s`", e.field)
 }
 
+func NewErrMissingField(field string) *ErrMissingField {
+	return &ErrMissingField{
+		field: field,
+	}
+}
+
 type ErrDuplicateField struct {
 	field string
 }
 
 func (e *ErrDuplicateField) Error() string {
 	return fmt.Sprintf("duplicate field `%s`", e.field)
+}
+
+func NewErrDuplicateField(field string) *ErrDuplicateField {
+	return &ErrDuplicateField{
+		field: field,
+	}
 }
