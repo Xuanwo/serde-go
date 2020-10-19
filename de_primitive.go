@@ -1,5 +1,17 @@
 package serde
 
+type DummyVisitor struct {
+	expect string
+}
+
+func (vi DummyVisitor) String() string {
+	if vi.expect == "" {
+		return "dummy"
+	}
+
+	return vi.expect
+}
+
 type StringVisitor struct {
 	v *string
 }

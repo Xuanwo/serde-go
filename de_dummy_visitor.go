@@ -2,6 +2,72 @@
 
 package serde
 
+func (vi DummyVisitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi DummyVisitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi DummyVisitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi DummyVisitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi DummyVisitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi DummyVisitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi DummyVisitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi DummyVisitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi DummyVisitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi DummyVisitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi DummyVisitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi DummyVisitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi DummyVisitor) VisitFloat32(v float32) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat32(v), vi)
+}
+func (vi DummyVisitor) VisitFloat64(v float64) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
+}
+func (vi DummyVisitor) VisitComplex64(v complex64) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex64(v), vi)
+}
+func (vi DummyVisitor) VisitComplex128(v complex128) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
+}
+func (vi DummyVisitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi DummyVisitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi DummyVisitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi DummyVisitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi DummyVisitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi DummyVisitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
 func (vi Int16Visitor) VisitNil() (err error) {
 	return NewInvalidTypeError(UnexpectedNil{}, vi)
 }

@@ -58,13 +58,13 @@ func main() {
 				if !strings.HasSuffix(v.Recv.Type, "Visitor") {
 					continue
 				}
-				// Ignore non-visit functions
-				if !strings.HasPrefix(v.Name, "Visit") {
-					continue
-				}
 
 				if _, ok := vis[v.Recv.Type]; !ok {
 					vis[v.Recv.Type] = make(map[string]bool)
+				}
+				// Ignore non-visit functions
+				if !strings.HasPrefix(v.Name, "Visit") {
+					continue
 				}
 
 				vis[v.Recv.Type][v.Name] = true
