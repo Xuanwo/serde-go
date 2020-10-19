@@ -1,9 +1,5 @@
 package serde
 
-import (
-	"time"
-)
-
 type Deserializable interface {
 	Deserialize(deserializer Deserializer) (err error)
 }
@@ -30,7 +26,6 @@ type Deserializer interface {
 	DeserializeString(v Visitor) (err error)
 	DeserializeByte(v Visitor) (err error)
 	DeserializeBytes(v Visitor) (err error)
-	DeserializeTime(v Visitor) (err error)
 
 	DeserializeSlice(v Visitor) (err error)
 	DeserializeMap(v Visitor) (err error)
@@ -59,7 +54,6 @@ type Visitor interface {
 	VisitString(v string) (err error)
 	VisitByte(v byte) (err error)
 	VisitBytes(v []byte) (err error)
-	VisitTime(v time.Time) (err error)
 
 	VisitSlice(s SliceAccess) (err error)
 	VisitMap(m MapAccess) (err error)
