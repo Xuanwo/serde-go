@@ -186,12 +186,25 @@ func generateSerialize() {}
 
 func (f *structFiled) Visitor() string {
 	switch f.Type {
-	case "int", "int8", "int16", "int32", "int64",
+	case "bool", "int", "int8", "int16", "int32", "int64",
 		"uint", "uint8", "uint16", "uint32", "uint64",
-		"string":
+		"float32", "float64", "complex64", "complex128",
+		"rune", "string", "byte", "bytes":
 		return fmt.Sprintf("serde.New%sVisitor", string(f.Type[0]-'a'+'A')+f.Type[1:])
 	default:
 		return fmt.Sprintf("new%sVisitor", f.Type)
+	}
+}
+
+func (f *structFiled) Serializer() string {
+	switch f.Type {
+	case "bool", "int", "int8", "int16", "int32", "int64",
+		"uint", "uint8", "uint16", "uint32", "uint64",
+		"float32", "float64", "complex64", "complex128",
+		"rune", "string", "byte", "bytes":
+		return fmt.Sprintf("serde.%sSerializer", string(f.Type[0]-'a'+'A')+f.Type[1:])
+	default:
+		return fmt.Sprintf("new%sSerializer", f.Type)
 	}
 }
 
@@ -289,5 +302,27 @@ func (s *serde{{ $.Name }}Visitor) VisitMap(m serde.MapAccess) (err error) {
 
 func (s *{{ $.Name }}) Deserialize(de serde.Deserializer) (err error) {
 	return de.DeserializeStruct("{{ $.Name }}", nil, new{{ $.Name }}Visitor(s))
+}
+
+func (s *{{ $.Name }}) Serialize(ser serde.Serializer) (err error) {
+	st, err := ser.SerializeStruct("{{ $.Name }}", {{ $.Fields | len }})
+	if err != nil {
+		return err
+	}
+
+{{- range $idx, $field := .Fields }}
+	err = st.SerializeField(
+		serde.StringSerializer("{{ $field.Name }}"),
+		{{ $field.Serializer }}(s.{{ $field.Name }}),
+	)
+	if err != nil {
+		return
+	}
+{{- end }}
+	err = st.EndStruct()
+	if err != nil {
+		return
+	}
+	return nil
 }
 `))
