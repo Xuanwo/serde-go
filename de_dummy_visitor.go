@@ -2,6 +2,327 @@
 
 package serde
 
+func (vi BoolVisitor) String() string {
+	return "bool"
+}
+func (vi BoolVisitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi BoolVisitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi BoolVisitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi BoolVisitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi BoolVisitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi BoolVisitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi BoolVisitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi BoolVisitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi BoolVisitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi BoolVisitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi BoolVisitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi BoolVisitor) VisitFloat32(v float32) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat32(v), vi)
+}
+func (vi BoolVisitor) VisitFloat64(v float64) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
+}
+func (vi BoolVisitor) VisitComplex64(v complex64) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex64(v), vi)
+}
+func (vi BoolVisitor) VisitComplex128(v complex128) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
+}
+func (vi BoolVisitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi BoolVisitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi BoolVisitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi BoolVisitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi BoolVisitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi BoolVisitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
+func (vi ByteVisitor) String() string {
+	return "byte"
+}
+func (vi ByteVisitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi ByteVisitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi ByteVisitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi ByteVisitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi ByteVisitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi ByteVisitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi ByteVisitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi ByteVisitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi ByteVisitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi ByteVisitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi ByteVisitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi ByteVisitor) VisitFloat32(v float32) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat32(v), vi)
+}
+func (vi ByteVisitor) VisitFloat64(v float64) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
+}
+func (vi ByteVisitor) VisitComplex64(v complex64) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex64(v), vi)
+}
+func (vi ByteVisitor) VisitComplex128(v complex128) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
+}
+func (vi ByteVisitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi ByteVisitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi ByteVisitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi ByteVisitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi ByteVisitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
+func (vi BytesVisitor) String() string {
+	return "bytes"
+}
+func (vi BytesVisitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi BytesVisitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi BytesVisitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi BytesVisitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi BytesVisitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi BytesVisitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi BytesVisitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi BytesVisitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi BytesVisitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi BytesVisitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi BytesVisitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi BytesVisitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi BytesVisitor) VisitFloat32(v float32) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat32(v), vi)
+}
+func (vi BytesVisitor) VisitFloat64(v float64) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
+}
+func (vi BytesVisitor) VisitComplex64(v complex64) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex64(v), vi)
+}
+func (vi BytesVisitor) VisitComplex128(v complex128) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
+}
+func (vi BytesVisitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi BytesVisitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi BytesVisitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi BytesVisitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi BytesVisitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
+func (vi Complex128Visitor) String() string {
+	return "complex128"
+}
+func (vi Complex128Visitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi Complex128Visitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi Complex128Visitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi Complex128Visitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi Complex128Visitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi Complex128Visitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi Complex128Visitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi Complex128Visitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi Complex128Visitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi Complex128Visitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi Complex128Visitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi Complex128Visitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi Complex128Visitor) VisitFloat32(v float32) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat32(v), vi)
+}
+func (vi Complex128Visitor) VisitFloat64(v float64) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
+}
+func (vi Complex128Visitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi Complex128Visitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi Complex128Visitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi Complex128Visitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi Complex128Visitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi Complex128Visitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
+func (vi Complex64Visitor) String() string {
+	return "complex64"
+}
+func (vi Complex64Visitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi Complex64Visitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi Complex64Visitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi Complex64Visitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi Complex64Visitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi Complex64Visitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi Complex64Visitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi Complex64Visitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi Complex64Visitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi Complex64Visitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi Complex64Visitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi Complex64Visitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi Complex64Visitor) VisitFloat32(v float32) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat32(v), vi)
+}
+func (vi Complex64Visitor) VisitFloat64(v float64) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
+}
+func (vi Complex64Visitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi Complex64Visitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi Complex64Visitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi Complex64Visitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi Complex64Visitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi Complex64Visitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
 func (vi DummyVisitor) VisitNil() (err error) {
 	return NewInvalidTypeError(UnexpectedNil{}, vi)
 }
@@ -66,6 +387,132 @@ func (vi DummyVisitor) VisitSlice(s SliceAccess) (err error) {
 	return NewInvalidTypeError(UnexpectedSlice{}, vi)
 }
 func (vi DummyVisitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
+func (vi Float32Visitor) String() string {
+	return "float32"
+}
+func (vi Float32Visitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi Float32Visitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi Float32Visitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi Float32Visitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi Float32Visitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi Float32Visitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi Float32Visitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi Float32Visitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi Float32Visitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi Float32Visitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi Float32Visitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi Float32Visitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi Float32Visitor) VisitComplex64(v complex64) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex64(v), vi)
+}
+func (vi Float32Visitor) VisitComplex128(v complex128) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
+}
+func (vi Float32Visitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi Float32Visitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi Float32Visitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi Float32Visitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi Float32Visitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi Float32Visitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
+func (vi Float64Visitor) String() string {
+	return "float64"
+}
+func (vi Float64Visitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi Float64Visitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi Float64Visitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi Float64Visitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi Float64Visitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi Float64Visitor) VisitInt32(v int32) (err error) {
+	return NewInvalidTypeError(UnexpectedInt32(v), vi)
+}
+func (vi Float64Visitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi Float64Visitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi Float64Visitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi Float64Visitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi Float64Visitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi Float64Visitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi Float64Visitor) VisitComplex64(v complex64) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex64(v), vi)
+}
+func (vi Float64Visitor) VisitComplex128(v complex128) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
+}
+func (vi Float64Visitor) VisitRune(v rune) (err error) {
+	return NewInvalidTypeError(UnexpectedRune(v), vi)
+}
+func (vi Float64Visitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi Float64Visitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi Float64Visitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi Float64Visitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi Float64Visitor) VisitMap(m MapAccess) (err error) {
 	return NewInvalidTypeError(UnexpectedMap{}, vi)
 }
 func (vi Int16Visitor) VisitNil() (err error) {
@@ -246,6 +693,69 @@ func (vi IntVisitor) VisitSlice(s SliceAccess) (err error) {
 	return NewInvalidTypeError(UnexpectedSlice{}, vi)
 }
 func (vi IntVisitor) VisitMap(m MapAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedMap{}, vi)
+}
+func (vi RuneVisitor) String() string {
+	return "rune"
+}
+func (vi RuneVisitor) VisitNil() (err error) {
+	return NewInvalidTypeError(UnexpectedNil{}, vi)
+}
+func (vi RuneVisitor) VisitBool(v bool) (err error) {
+	return NewInvalidTypeError(UnexpectedBool(v), vi)
+}
+func (vi RuneVisitor) VisitInt(v int) (err error) {
+	return NewInvalidTypeError(UnexpectedInt(v), vi)
+}
+func (vi RuneVisitor) VisitInt8(v int8) (err error) {
+	return NewInvalidTypeError(UnexpectedInt8(v), vi)
+}
+func (vi RuneVisitor) VisitInt16(v int16) (err error) {
+	return NewInvalidTypeError(UnexpectedInt16(v), vi)
+}
+func (vi RuneVisitor) VisitInt64(v int64) (err error) {
+	return NewInvalidTypeError(UnexpectedInt64(v), vi)
+}
+func (vi RuneVisitor) VisitUint(v uint) (err error) {
+	return NewInvalidTypeError(UnexpectedUint(v), vi)
+}
+func (vi RuneVisitor) VisitUint8(v uint8) (err error) {
+	return NewInvalidTypeError(UnexpectedUint8(v), vi)
+}
+func (vi RuneVisitor) VisitUint16(v uint16) (err error) {
+	return NewInvalidTypeError(UnexpectedUint16(v), vi)
+}
+func (vi RuneVisitor) VisitUint32(v uint32) (err error) {
+	return NewInvalidTypeError(UnexpectedUint32(v), vi)
+}
+func (vi RuneVisitor) VisitUint64(v uint64) (err error) {
+	return NewInvalidTypeError(UnexpectedUint64(v), vi)
+}
+func (vi RuneVisitor) VisitFloat32(v float32) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat32(v), vi)
+}
+func (vi RuneVisitor) VisitFloat64(v float64) (err error) {
+	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
+}
+func (vi RuneVisitor) VisitComplex64(v complex64) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex64(v), vi)
+}
+func (vi RuneVisitor) VisitComplex128(v complex128) (err error) {
+	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
+}
+func (vi RuneVisitor) VisitString(v string) (err error) {
+	return NewInvalidTypeError(UnexpectedString(v), vi)
+}
+func (vi RuneVisitor) VisitByte(v byte) (err error) {
+	return NewInvalidTypeError(UnexpectedByte(v), vi)
+}
+func (vi RuneVisitor) VisitBytes(v []byte) (err error) {
+	return NewInvalidTypeError(UnexpectedBytes{}, vi)
+}
+func (vi RuneVisitor) VisitSlice(s SliceAccess) (err error) {
+	return NewInvalidTypeError(UnexpectedSlice{}, vi)
+}
+func (vi RuneVisitor) VisitMap(m MapAccess) (err error) {
 	return NewInvalidTypeError(UnexpectedMap{}, vi)
 }
 func (vi StringVisitor) VisitNil() (err error) {

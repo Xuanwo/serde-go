@@ -29,4 +29,11 @@ const (
 	MaxUint32 = math.MaxUint32
 	MinUint64 = 0
 	MaxUint64 = math.MaxUint64
+
+	MinFloat32 = math.SmallestNonzeroFloat32
+	MaxFloat32 = math.MaxFloat32
+	MinFloat64 = math.SmallestNonzeroFloat64
+	MaxFloat64 = math.MaxFloat64
+
+	x = complex(1, 2)
 )
