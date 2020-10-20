@@ -12,6 +12,10 @@ func (vi DummyVisitor) String() string {
 	return vi.expect
 }
 
+func NewDummyVisitor(expect string) DummyVisitor {
+	return DummyVisitor{expect: expect}
+}
+
 type StringVisitor struct {
 	v *string
 }

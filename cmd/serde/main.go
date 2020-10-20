@@ -227,6 +227,12 @@ type serde{{ $.Name }}FieldVisitor struct {
 	serde.DummyVisitor
 }
 
+func newSerde{{ $.Name }}FieldVisitor() *serde{{ $.Name }}FieldVisitor {
+	return &serde{{ $.Name }}FieldVisitor{
+		DummyVisitor: serde.NewDummyVisitor("{{ $.Name }} Field"),
+	}
+}
+
 func (s *serde{{ $.Name }}FieldVisitor) VisitString(v string) (err error) {
 	switch v {
 {{- range $idx, $field := .Fields }}
@@ -246,11 +252,14 @@ type serde{{ $.Name }}Visitor struct {
 }
 
 func new{{ $.Name }}Visitor(v *{{ $.Name }}) *serde{{ $.Name }}Visitor {
-	return &serde{{ $.Name }}Visitor{v: v}
+	return &serde{{ $.Name }}Visitor{
+		v: v,
+		DummyVisitor: serde.NewDummyVisitor("{{ $.Name }}"),
+	}
 }
 
 func (s *serde{{ $.Name }}Visitor) VisitMap(m serde.MapAccess) (err error) {
-	field := &serde{{ $.Name }}FieldVisitor{}
+	field := newSerde{{ $.Name }}FieldVisitor()
 	for {
 		ok, err := m.NextKey(field)
 		if !ok {
