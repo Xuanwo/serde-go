@@ -34,6 +34,4 @@ const (
 	MaxFloat32 = math.MaxFloat32
 	MinFloat64 = math.SmallestNonzeroFloat64
 	MaxFloat64 = math.MaxFloat64
-
-	x = complex(1, 2)
 )
