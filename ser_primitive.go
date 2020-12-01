@@ -93,7 +93,7 @@ func (s Complex128Serializer) Serialize(ser Serializer) (err error) {
 type RuneSerializer rune
 
 func (s RuneSerializer) Serialize(ser Serializer) (err error) {
-	return ser.SerializeRune(rune(s))
+	return ser.SerializeInt32(rune(s))
 }
 
 type StringSerializer string
@@ -105,7 +105,7 @@ func (s StringSerializer) Serialize(ser Serializer) (err error) {
 type ByteSerializer byte
 
 func (s ByteSerializer) Serialize(ser Serializer) (err error) {
-	return ser.SerializeByte(byte(s))
+	return ser.SerializeUint8(byte(s))
 }
 
 type BytesSerializer []byte

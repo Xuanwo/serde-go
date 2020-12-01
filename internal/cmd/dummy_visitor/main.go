@@ -196,21 +196,9 @@ func (vi {{$name}}) VisitComplex128(v complex128) (err error) {
 }
 {{- end }}
 
-{{- if not (index $funcs "VisitRune") }}
-func (vi {{$name}}) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
-{{- end }}
-
 {{- if not (index $funcs "VisitString") }}
 func (vi {{$name}}) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-{{- end }}
-
-{{- if not (index $funcs "VisitByte") }}
-func (vi {{$name}}) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 {{- end }}
 

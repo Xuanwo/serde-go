@@ -20,9 +20,7 @@ type Serializer interface {
 	SerializeFloat64(v float64) (err error)
 	SerializeComplex64(v complex64) (err error)
 	SerializeComplex128(v complex128) (err error)
-	SerializeRune(v rune) (err error)
 	SerializeString(v string) (err error)
-	SerializeByte(v byte) (err error)
 	SerializeBytes(v []byte) (err error)
 
 	SerializeSlice(length int) (s SliceSerializer, err error)

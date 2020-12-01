@@ -50,14 +50,8 @@ func (vi BoolVisitor) VisitComplex64(v complex64) (err error) {
 func (vi BoolVisitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi BoolVisitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi BoolVisitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi BoolVisitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi BoolVisitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -115,9 +109,6 @@ func (vi ByteVisitor) VisitComplex64(v complex64) (err error) {
 }
 func (vi ByteVisitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
-}
-func (vi ByteVisitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
 }
 func (vi ByteVisitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
@@ -182,14 +173,8 @@ func (vi BytesVisitor) VisitComplex64(v complex64) (err error) {
 func (vi BytesVisitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi BytesVisitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi BytesVisitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi BytesVisitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi BytesVisitor) VisitSlice(s SliceAccess) (err error) {
 	return NewInvalidTypeError(UnexpectedSlice{}, vi)
@@ -242,14 +227,8 @@ func (vi Complex128Visitor) VisitFloat32(v float32) (err error) {
 func (vi Complex128Visitor) VisitFloat64(v float64) (err error) {
 	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
 }
-func (vi Complex128Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Complex128Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Complex128Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Complex128Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -305,14 +284,8 @@ func (vi Complex64Visitor) VisitFloat32(v float32) (err error) {
 func (vi Complex64Visitor) VisitFloat64(v float64) (err error) {
 	return NewInvalidTypeError(UnexpectedFloat64(v), vi)
 }
-func (vi Complex64Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Complex64Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Complex64Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Complex64Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -371,14 +344,8 @@ func (vi DummyVisitor) VisitComplex64(v complex64) (err error) {
 func (vi DummyVisitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi DummyVisitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi DummyVisitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi DummyVisitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi DummyVisitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -434,14 +401,8 @@ func (vi Float32Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Float32Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Float32Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Float32Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Float32Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Float32Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -497,14 +458,8 @@ func (vi Float64Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Float64Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Float64Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Float64Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Float64Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Float64Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -533,14 +488,8 @@ func (vi Int16Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Int16Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Int16Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Int16Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Int16Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Int16Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -569,14 +518,8 @@ func (vi Int32Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Int32Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Int32Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Int32Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Int32Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Int32Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -605,14 +548,8 @@ func (vi Int64Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Int64Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Int64Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Int64Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Int64Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Int64Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -641,14 +578,8 @@ func (vi Int8Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Int8Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Int8Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Int8Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Int8Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Int8Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -677,14 +608,8 @@ func (vi IntVisitor) VisitComplex64(v complex64) (err error) {
 func (vi IntVisitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi IntVisitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi IntVisitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi IntVisitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi IntVisitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -746,9 +671,6 @@ func (vi RuneVisitor) VisitComplex128(v complex128) (err error) {
 func (vi RuneVisitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
 }
-func (vi RuneVisitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
-}
 func (vi RuneVisitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
 }
@@ -806,12 +728,6 @@ func (vi StringVisitor) VisitComplex64(v complex64) (err error) {
 func (vi StringVisitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi StringVisitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
-func (vi StringVisitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
-}
 func (vi StringVisitor) VisitSlice(s SliceAccess) (err error) {
 	return NewInvalidTypeError(UnexpectedSlice{}, vi)
 }
@@ -836,14 +752,8 @@ func (vi Uint16Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Uint16Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Uint16Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Uint16Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Uint16Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Uint16Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -872,14 +782,8 @@ func (vi Uint32Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Uint32Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Uint32Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Uint32Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Uint32Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Uint32Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -908,14 +812,8 @@ func (vi Uint64Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Uint64Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Uint64Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Uint64Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Uint64Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Uint64Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -944,14 +842,8 @@ func (vi Uint8Visitor) VisitComplex64(v complex64) (err error) {
 func (vi Uint8Visitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi Uint8Visitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi Uint8Visitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi Uint8Visitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi Uint8Visitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)
@@ -980,14 +872,8 @@ func (vi UintVisitor) VisitComplex64(v complex64) (err error) {
 func (vi UintVisitor) VisitComplex128(v complex128) (err error) {
 	return NewInvalidTypeError(UnexpectedComplex128(v), vi)
 }
-func (vi UintVisitor) VisitRune(v rune) (err error) {
-	return NewInvalidTypeError(UnexpectedRune(v), vi)
-}
 func (vi UintVisitor) VisitString(v string) (err error) {
 	return NewInvalidTypeError(UnexpectedString(v), vi)
-}
-func (vi UintVisitor) VisitByte(v byte) (err error) {
-	return NewInvalidTypeError(UnexpectedByte(v), vi)
 }
 func (vi UintVisitor) VisitBytes(v []byte) (err error) {
 	return NewInvalidTypeError(UnexpectedBytes{}, vi)

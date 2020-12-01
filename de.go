@@ -22,9 +22,7 @@ type Deserializer interface {
 	DeserializeFloat64(v Visitor) (err error)
 	DeserializeComplex64(v Visitor) (err error)
 	DeserializeComplex128(v Visitor) (err error)
-	DeserializeRune(v Visitor) (err error)
 	DeserializeString(v Visitor) (err error)
-	DeserializeByte(v Visitor) (err error)
 	DeserializeBytes(v Visitor) (err error)
 
 	DeserializeSlice(v Visitor) (err error)
@@ -50,9 +48,7 @@ type Visitor interface {
 	VisitFloat64(v float64) (err error)
 	VisitComplex64(v complex64) (err error)
 	VisitComplex128(v complex128) (err error)
-	VisitRune(v rune) (err error)
 	VisitString(v string) (err error)
-	VisitByte(v byte) (err error)
 	VisitBytes(v []byte) (err error)
 
 	VisitSlice(s SliceAccess) (err error)
