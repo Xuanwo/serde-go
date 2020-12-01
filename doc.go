@@ -1,4 +1,4 @@
 package serde
 
-//go:generate ./internal/bin/integer_visitor
-//go:generate ./internal/bin/dummy_visitor
+//go:generate go run -tags tools ./internal/cmd/integer_visitor
+//go:generate go run -tags tools ./internal/cmd/dummy_visitor
