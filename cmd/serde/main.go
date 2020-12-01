@@ -33,7 +33,6 @@ func main() {
 
 	for _, pkg := range pkgs {
 		for _, file := range pkg.GoFiles {
-			log.Printf("read file: %s", file)
 			content, err := ioutil.ReadFile(file)
 			if err != nil {
 				log.Fatalf("read file %s: %v", file, err)
