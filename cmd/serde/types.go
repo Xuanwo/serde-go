@@ -18,6 +18,7 @@ const SerdePrefix = "// serde:"
 type serdeType interface {
 	Name() string
 	Visitor() string
+	NewVisitor() string
 	Serializer() string
 	Generate() string
 }
@@ -106,32 +107,32 @@ func (s *serdeStruct) ParseFields(state *serdeState) {
 }
 
 var serdeStructTmpl = template.Must(template.New("struct").Parse(`
-type serde{{ $.Name }}Enum = int
+type serdeStructEnum_{{ $.Name }} = int
 
 const (
 {{- range $idx, $field := .Fields }}
-	serde{{ $.Name }}Enum{{ $field.Name }} {{ if eq $idx 0 }} serde{{ $.Name }}Enum = iota + 1 {{ end }}
+	serdeStructEnum_{{ $.Name }}_{{ $field.Name }} {{ if eq $idx 0 }} serdeStructEnum_{{ $.Name }} = iota + 1 {{ end }}
 {{- end }}
 )
 
 {{ if (index $.Flags "Deserialize") }}
-type serde{{ $.Name }}FieldVisitor struct {
-	e serde{{ $.Name }}Enum
+type {{ $.FieldVisitor }} struct {
+	e serdeStructEnum_{{ $.Name }}
 
 	serde.DummyVisitor
 }
 
-func newSerde{{ $.Name }}FieldVisitor() *serde{{ $.Name }}FieldVisitor {
-	return &serde{{ $.Name }}FieldVisitor{
+func serdeNewStructFieldVisitor_{{ $.Name }}() *{{ $.FieldVisitor }} {
+	return &serdeStructFieldVisitor_{{ $.Name }}{
 		DummyVisitor: serde.NewDummyVisitor("{{ $.Name }} Field"),
 	}
 }
 
-func (s *serde{{ $.Name }}FieldVisitor) VisitString(v string) (err error) {
+func (s *{{ $.FieldVisitor }}) VisitString(v string) (err error) {
 	switch v {
 {{- range $idx, $field := .Fields }}
 	case "{{ $field.Name }}":
-		s.e = serde{{ $.Name }}Enum{{ $field.Name }}
+		s.e = serdeStructEnum_{{ $.Name }}_{{ $field.Name }}
 {{- end }}
 	default:
 		return errors.New("invalid field")
@@ -139,21 +140,21 @@ func (s *serde{{ $.Name }}FieldVisitor) VisitString(v string) (err error) {
 	return nil
 }
 
-type serde{{ $.Name }}Visitor struct {
+type {{ $.Visitor }} struct {
 	v *{{ $.Name }}
 
 	serde.DummyVisitor
 }
 
-func new{{ $.Name }}Visitor(v *{{ $.Name }}) *serde{{ $.Name }}Visitor {
-	return &serde{{ $.Name }}Visitor{
+func serdeNewStructVisitor_{{ $.Name }}(v *{{ $.Name }}) *{{ $.Visitor }} {
+	return &{{ $.Visitor }}{
 		v: v,
 		DummyVisitor: serde.NewDummyVisitor("{{ $.Name }}"),
 	}
 }
 
-func (s *serde{{ $.Name }}Visitor) VisitMap(m serde.MapAccess) (err error) {
-	field := newSerde{{ $.Name }}FieldVisitor()
+func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
+	field := serdeNewStructFieldVisitor_{{ $.Name }}()
 	for {
 		ok, err := m.NextKey(field)
 		if !ok {
@@ -166,8 +167,8 @@ func (s *serde{{ $.Name }}Visitor) VisitMap(m serde.MapAccess) (err error) {
 		var v serde.Visitor
 		switch field.e {
 {{- range $idx, $field := .Fields }}
-		case serde{{ $.Name }}Enum{{ $field.Name }}:
-			v = {{ $field.Visitor }}(&s.v.{{ $field.Name }})
+		case serdeStructEnum_{{ $.Name }}_{{ $field.Name }}:
+			v = {{ $field.NewVisitor }}(&s.v.{{ $field.Name }})
 {{- end }}
 		default:
 			return errors.New("invalid field")
@@ -182,7 +183,7 @@ func (s *serde{{ $.Name }}Visitor) VisitMap(m serde.MapAccess) (err error) {
 }
 
 func (s *{{ $.Name }}) Deserialize(de serde.Deserializer) (err error) {
-	return de.DeserializeStruct("{{ $.Name }}", nil, new{{ $.Name }}Visitor(s))
+	return de.DeserializeStruct("{{ $.Name }}", nil, {{ $.NewVisitor }}(s))
 }
 {{end}}
 
@@ -252,13 +253,20 @@ func (s structType) Name() string {
 	return string(s)
 }
 
+func (s structType) FieldVisitor() string {
+	return fmt.Sprintf("serdeStructFieldVisitor_%s", s)
+}
+
 func (s structType) Visitor() string {
-	return fmt.Sprintf("new%sVisitor", s)
+	return fmt.Sprintf("serdeStructVisitor_%s", s)
+}
+
+func (s structType) NewVisitor() string {
+	return fmt.Sprintf("serdeNewStructVisitor_%s", s)
 }
 
 func (s structType) Serializer() string {
-	// FIXME: we need to make sure this type will not exported.
-	return fmt.Sprintf("%sSerializer", templateutils.ToUpperFirst(string(s)))
+	return fmt.Sprintf("%s", string(s))
 }
 
 func (s structType) Generate() string {
@@ -284,6 +292,18 @@ func (bt basicType) Name() string {
 }
 
 func (bt basicType) Visitor() string {
+	switch bt {
+	case "bool", "int", "int8", "int16", "int32", "int64",
+		"uint", "uint8", "uint16", "uint32", "uint64",
+		"float32", "float64", "complex64", "complex128",
+		"rune", "string", "byte", "bytes":
+		return fmt.Sprintf("serde.%sVisitor", templateutils.ToUpperFirst(string(bt)))
+	default:
+		panic(fmt.Errorf("%s is not a basic type", bt))
+	}
+}
+
+func (bt basicType) NewVisitor() string {
 	switch bt {
 	case "bool", "int", "int8", "int16", "int32", "int64",
 		"uint", "uint8", "uint16", "uint32", "uint64",
@@ -327,50 +347,84 @@ func (m mapType) Key() serdeType {
 func (m mapType) Value() serdeType {
 	return m.value
 }
+
 func (m mapType) Name() string {
-	return fmt.Sprintf("map%s%s", m.key.Name(), m.value.Name())
+	return fmt.Sprintf("%s_%s", m.key.Name(), m.value.Name())
 }
+
 func (m mapType) Visitor() string {
-	return fmt.Sprintf("new%sVisitor", templateutils.ToUpperFirst(m.Name()))
+	return fmt.Sprintf("serdeMapVisitor_%s", m.Name())
+}
+
+func (m mapType) NewVisitor() string {
+	return fmt.Sprintf("serdeNewMapVisitor_%s", m.Name())
 }
 
 func (m mapType) Serializer() string {
-	return fmt.Sprintf("%sSerializer", m.Name())
+	return fmt.Sprintf("serdeSerializer_%s", m.Name())
 }
 
 var serdeMapTmpl = template.Must(template.New("map").Parse(`
-type serde{{ $.Name }}Visitor struct {
+type {{ $.Visitor }} struct {
 	v *{{ $.TypeName }}
 
 	serde.DummyVisitor
 }
 
-func new{{ $.Name }}Visitor(v *{{ $.TypeName }}) *serde{{ $.Name }}Visitor {
-	return &serde{{ $.Name }}Visitor{
+func {{ $.NewVisitor }}(v *{{ $.TypeName }}) *{{ $.Visitor }} {
+	if *v == nil {
+		*v = make({{ $.TypeName }})
+	}
+	return &{{ $.Visitor }}{
 		v: v,
-		DummyVisitor: serde.NewDummyVisitor("{{ $.Name }}"),
+		DummyVisitor: serde.NewDummyVisitor("{{ $.TypeName }}"),
 	}
 }
 
-func (s *serde{{ $.Name }}Visitor) VisitMap(m serde.MapAccess) (err error) {
+func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 	var field {{ $.Key.Name }}
 	var value {{ $.Value.Name }}
 	for {
-		ok, err := m.NextKey({{$.Key.Visitor}}(field))
+		ok, err := m.NextKey({{$.Key.NewVisitor}}(&field))
 		if !ok {
 			break
 		}
 		if err != nil {
 			return err
 		}
-		err = m.NextValue({{$.Value.Visitor}}(value))
+		err = m.NextValue({{$.Value.NewVisitor}}(&value))
 		if err != nil {
 			return err
 		}
-		s.v[field] = value
+		(*s.v)[field] = value
 	}
+	return nil
 }
 
+type {{ $.Serializer }} {{ $.TypeName }}
+
+func (s {{ $.Serializer }}) Serialize(ser serde.Serializer) (err error) {
+	st, err := ser.SerializeMap(len(s))
+	if err != nil {
+		return err
+	}
+
+	for k, v := range s {
+		err = st.SerializeEntry(
+			{{ $.Key.Serializer }}(k),
+			{{ $.Value.Serializer }}(v),
+		)
+		if err != nil {
+			return
+		}
+	}
+
+	err = st.EndMap()
+	if err != nil {
+		return
+	}
+	return nil
+}
 `))
 
 func (m mapType) Generate() string {
