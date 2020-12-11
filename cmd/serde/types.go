@@ -512,6 +512,10 @@ func {{ $.NewVisitor }}(v *{{ $.TypeName }}) *{{ $.Visitor }} {
 
 func (s *{{ $.Visitor }}) VisitSlice(m serde.SliceAccess) (err error) {
 	var value {{ $.Element.Name }}
+
+	{{- if ne $.Length 0 }}
+	i := 0
+	{{- end }}
 	for {
 		ok, err := m.NextElement({{$.Element.NewVisitor}}(&value))
 		if !ok {
@@ -520,7 +524,12 @@ func (s *{{ $.Visitor }}) VisitSlice(m serde.SliceAccess) (err error) {
 		if err != nil {
 			return err
 		}
+		{{ if eq $.Length 0 }}
 		*s.v = append(*s.v, value)
+		{{ else }}
+		(*s.v)[i] = value
+		i += 1
+		{{ end }}
 	}
 	return nil
 }
