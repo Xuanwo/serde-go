@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go/ast"
 	"log"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -94,7 +95,7 @@ func (s *serdeStruct) ParseFields(state *serdeState) {
 			st := parseSerdeType(v.Type)
 
 			switch st.(type) {
-			case mapType:
+			case mapType, sliceType:
 				state.AppendTodo(st)
 			}
 
@@ -236,6 +237,24 @@ func parseSerdeType(t ast.Expr) serdeType {
 			key:   parseSerdeType(ty.Key),
 			value: parseSerdeType(ty.Value),
 		}
+	case *ast.ArrayType:
+		st := sliceType{
+			length:  0,
+			element: parseSerdeType(ty.Elt),
+		}
+
+		if l, ok := ty.Len.(*ast.BasicLit); ok {
+			stl, err := strconv.ParseInt(l.Value, 10, 64)
+			if err != nil {
+				panic(fmt.Errorf("invalid array length: %v", l.Value))
+			}
+
+			st.length = int(stl)
+		}
+		return st
+	case *ast.FuncType, *ast.ChanType:
+		// Ignore golang runtime types.
+		return nil
 	default:
 		log.Panicf("Expr %#+v is not supported for now", ty)
 		return nil
@@ -336,10 +355,6 @@ type mapType struct {
 	value serdeType
 }
 
-func (m mapType) TypeName() string {
-	return fmt.Sprintf("map[%s]%s", m.key.Name(), m.value.Name())
-}
-
 func (m mapType) Key() serdeType {
 	return m.key
 }
@@ -350,6 +365,10 @@ func (m mapType) Value() serdeType {
 
 func (m mapType) Name() string {
 	return fmt.Sprintf("%s_%s", m.key.Name(), m.value.Name())
+}
+
+func (m mapType) TypeName() string {
+	return fmt.Sprintf("map[%s]%s", m.key.Name(), m.value.Name())
 }
 
 func (m mapType) Visitor() string {
@@ -432,7 +451,109 @@ func (m mapType) Generate() string {
 
 	err := serdeMapTmpl.Execute(&buf, m)
 	if err != nil {
-		log.Fatalf(" map %+v execute: %v", m, err)
+		log.Fatalf("map %+v execute: %v", m, err)
+	}
+
+	return buf.String()
+}
+
+type sliceType struct {
+	length  int
+	element serdeType
+}
+
+func (s sliceType) Name() string {
+	if s.length == 0 {
+		return fmt.Sprintf("%s", s.element.Name())
+	}
+	return fmt.Sprintf("%d_%s", s.length, s.element.Name())
+}
+
+func (s sliceType) TypeName() string {
+	if s.length != 0 {
+		return fmt.Sprintf("[%d]%s", s.length, s.element.Name())
+	}
+	return fmt.Sprintf("[]%s", s.element.Name())
+}
+
+func (s sliceType) Length() int {
+	return s.length
+}
+
+func (s sliceType) Element() serdeType {
+	return s.element
+}
+
+func (s sliceType) Visitor() string {
+	return fmt.Sprintf("serdeSliceVisitor_%s", s.Name())
+}
+
+func (s sliceType) NewVisitor() string {
+	return fmt.Sprintf("serdeNewSliceVisitor_%s", s.Name())
+}
+
+func (s sliceType) Serializer() string {
+	return fmt.Sprintf("serdeSerializer_%s", s.Name())
+}
+
+var serdeSliceTmpl = template.Must(template.New("slice").Parse(`
+type {{ $.Visitor }} struct {
+	v *{{ $.TypeName }}
+
+	serde.DummyVisitor
+}
+
+func {{ $.NewVisitor }}(v *{{ $.TypeName }}) *{{ $.Visitor }} {
+	return &{{ $.Visitor }}{
+		v: v,
+		DummyVisitor: serde.NewDummyVisitor("{{ $.TypeName }}"),
+	}
+}
+
+func (s *{{ $.Visitor }}) VisitSlice(m serde.SliceAccess) (err error) {
+	var value {{ $.Element.Name }}
+	for {
+		ok, err := m.NextElement({{$.Element.NewVisitor}}(&value))
+		if !ok {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		*s.v = append(*s.v, value)
+	}
+	return nil
+}
+
+type {{ $.Serializer }} {{ $.TypeName }}
+
+func (s {{ $.Serializer }}) Serialize(ser serde.Serializer) (err error) {
+	st, err := ser.SerializeSlice(len(s))
+	if err != nil {
+		return err
+	}
+
+	for _, v := range s {
+		err = st.SerializeElement({{ $.Element.Serializer }}(v))
+		if err != nil {
+			return
+		}
+	}
+
+	err = st.EndSlice()
+	if err != nil {
+		return
+	}
+	return nil
+}
+`))
+
+func (s sliceType) Generate() string {
+	var buf bytes.Buffer
+
+	err := serdeSliceTmpl.Execute(&buf, s)
+	if err != nil {
+		log.Fatalf("slice %+v execute: %v", s, err)
 	}
 
 	return buf.String()
