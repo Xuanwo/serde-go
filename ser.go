@@ -5,6 +5,8 @@ type Serializable interface {
 }
 
 type Serializer interface {
+	SerializeNil() (err error)
+
 	SerializeBool(v bool) (err error)
 	SerializeInt(v int) (err error)
 	SerializeInt8(v int8) (err error)

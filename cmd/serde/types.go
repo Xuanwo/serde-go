@@ -95,7 +95,7 @@ func (s *serdeStruct) ParseFields(state *serdeState) {
 			st := parseSerdeType(v.Type)
 
 			switch st.(type) {
-			case mapType, sliceType:
+			case mapType, sliceType, pointerType:
 				state.AppendTodo(st)
 			}
 
@@ -252,6 +252,8 @@ func parseSerdeType(t ast.Expr) serdeType {
 			st.length = int(stl)
 		}
 		return st
+	case *ast.StarExpr:
+		return pointerType{internal: parseSerdeType(ty.X)}
 	case *ast.FuncType, *ast.ChanType:
 		// Ignore golang runtime types.
 		return nil
@@ -308,6 +310,10 @@ func isBasicType(v string) bool {
 
 func (bt basicType) Name() string {
 	return string(bt)
+}
+
+func (bt basicType) TypeName() string {
+	return bt.Name()
 }
 
 func (bt basicType) Visitor() string {
@@ -380,7 +386,7 @@ func (m mapType) NewVisitor() string {
 }
 
 func (m mapType) Serializer() string {
-	return fmt.Sprintf("serdeSerializer_%s", m.Name())
+	return fmt.Sprintf("serdeMapSerializer_%s", m.Name())
 }
 
 var serdeMapTmpl = template.Must(template.New("map").Parse(`
@@ -493,7 +499,7 @@ func (s sliceType) NewVisitor() string {
 }
 
 func (s sliceType) Serializer() string {
-	return fmt.Sprintf("serdeSerializer_%s", s.Name())
+	return fmt.Sprintf("serdeSliceSerializer_%s", s.Name())
 }
 
 var serdeSliceTmpl = template.Must(template.New("slice").Parse(`
@@ -563,6 +569,65 @@ func (s sliceType) Generate() string {
 	err := serdeSliceTmpl.Execute(&buf, s)
 	if err != nil {
 		log.Fatalf("slice %+v execute: %v", s, err)
+	}
+
+	return buf.String()
+}
+
+type pointerType struct {
+	internal serdeType
+}
+
+func (p pointerType) Name() string {
+	return fmt.Sprintf("%s", p.internal.Name())
+}
+
+func (p pointerType) TypeName() string {
+	return fmt.Sprintf("*%s", p.internal.Name())
+}
+
+func (p pointerType) Internal() serdeType {
+	return p.internal
+}
+
+func (p pointerType) Visitor() string {
+	return fmt.Sprintf("serdePointerVisitor_%s", p.Name())
+}
+
+func (p pointerType) NewVisitor() string {
+	return fmt.Sprintf("serdeNewPointerVisitor_%s", p.Name())
+}
+
+func (p pointerType) Serializer() string {
+	return fmt.Sprintf("serdePointerSerializer_%s", p.Name())
+}
+
+var serdePointerTmpl = template.Must(template.New("pointer").Parse(`
+type {{ $.Visitor }} struct {
+	{{ $.Internal.Visitor }}
+}
+
+func {{ $.NewVisitor }}(v *{{ $.TypeName }}) {{ $.Visitor }} {
+	// FIXME: nil is not handled correctly
+	var tv {{ $.Internal.TypeName }}
+	*v = &tv
+	return {{ $.Visitor }}{ {{ $.Internal.NewVisitor }}(*v) }
+}
+
+func {{ $.Serializer }}(v {{ $.TypeName }}) serde.Serializable {
+	if v == nil {
+		return serde.NilSerializer{}
+	}
+	return {{ $.Internal.Serializer }}(*v)
+}
+`))
+
+func (p pointerType) Generate() string {
+	var buf bytes.Buffer
+
+	err := serdePointerTmpl.Execute(&buf, p)
+	if err != nil {
+		log.Fatalf("pointer %+v execute: %v", p, err)
 	}
 
 	return buf.String()

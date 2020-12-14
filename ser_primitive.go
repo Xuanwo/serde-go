@@ -113,3 +113,9 @@ type BytesSerializer []byte
 func (s BytesSerializer) Serialize(ser Serializer) (err error) {
 	return ser.SerializeBytes(s)
 }
+
+type NilSerializer struct{}
+
+func (n NilSerializer) Serialize(ser Serializer) (err error) {
+	return ser.SerializeNil()
+}
