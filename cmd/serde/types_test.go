@@ -17,6 +17,7 @@ type Test struct {
 	vmap map[int]int
 	varray [2]int
 	vslice []int
+	vpointer *int
 }
 `
 
