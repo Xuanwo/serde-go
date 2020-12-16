@@ -5,25 +5,15 @@ package main
 import (
 	"go/parser"
 	"go/token"
+	"io/ioutil"
 	"testing"
 )
 
-const testContent = `
-package test
-
-// serde: Deserialize,Serialize
-type Test struct {
-	vint64 int64
-	vmap map[int]int
-	varray [2]int
-	vslice []int
-	vpointer *int
-}
-`
-
 func TestStructType(t *testing.T) {
+	testContent, _ := ioutil.ReadFile("testdata/test.go")
+
 	state := newSerdeState()
-	parseStructs(t, state, testContent)
+	parseStructs(t, state, string(testContent))
 
 	for _, v := range state.todo {
 		t.Logf("%s", v.Generate())

@@ -8,13 +8,10 @@ import (
 	"go/ast"
 	"log"
 	"strconv"
-	"strings"
 	"text/template"
 
 	"github.com/Xuanwo/templateutils"
 )
-
-const SerdePrefix = "// serde:"
 
 type serdeType interface {
 	Name() string
@@ -57,36 +54,23 @@ type serdeStruct struct {
 	structType
 
 	Fields []structField
-	Flags  map[string]bool
+	Flags  map[string]string
 
-	comments *ast.CommentGroup
-	decl     *ast.StructType
+	decl *ast.StructType
 }
 
 func newSerdeStruct(name string, comments *ast.CommentGroup, decl *ast.StructType) serdeStruct {
-	s := serdeStruct{
+	return serdeStruct{
 		structType: structType(name),
-		comments:   comments,
 		decl:       decl,
-		Flags:      map[string]bool{},
+		Flags:      parseTagsFromStructComments(comments),
 	}
-
-	for _, comment := range s.comments.List {
-		if !strings.HasPrefix(comment.Text, SerdePrefix) {
-			continue
-		}
-		text := strings.TrimPrefix(comment.Text, SerdePrefix)
-
-		for _, v := range strings.Split(text, ",") {
-			s.Flags[strings.Trim(v, " ")] = true
-		}
-	}
-
-	return s
 }
 
 func (s serdeStruct) NeedGenerate() bool {
-	return len(s.Flags) > 0
+	_, hasDeserialize := s.Flags["deserialize"]
+	_, hasSerialize := s.Flags["serialize"]
+	return hasDeserialize || hasSerialize
 }
 
 func (s *serdeStruct) ParseFields(state *serdeState) {
@@ -101,6 +85,7 @@ func (s *serdeStruct) ParseFields(state *serdeState) {
 
 			s.Fields = append(s.Fields, structField{
 				Name:      name.Name,
+				Flags:     parseTagsFromStructTag(v.Tag),
 				serdeType: st,
 			})
 		}
@@ -264,7 +249,8 @@ func parseSerdeType(t ast.Expr) serdeType {
 }
 
 type structField struct {
-	Name string
+	Name  string
+	Flags map[string]string
 	serdeType
 }
 
