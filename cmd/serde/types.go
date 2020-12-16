@@ -67,9 +67,19 @@ func newSerdeStruct(name string, comments *ast.CommentGroup, decl *ast.StructTyp
 	}
 }
 
+func (s serdeStruct) IsSerialize() bool {
+	_, hasSerialize := s.Flags[TagSerialize]
+	return hasSerialize
+}
+
+func (s serdeStruct) IsDeserialize() bool {
+	_, hasDeserialize := s.Flags[TagDeserialize]
+	return hasDeserialize
+}
+
 func (s serdeStruct) NeedGenerate() bool {
-	_, hasDeserialize := s.Flags["deserialize"]
-	_, hasSerialize := s.Flags["serialize"]
+	_, hasDeserialize := s.Flags[TagDeserialize]
+	_, hasSerialize := s.Flags[TagSerialize]
 	return hasDeserialize || hasSerialize
 }
 
@@ -92,16 +102,18 @@ func (s *serdeStruct) ParseFields(state *serdeState) {
 	}
 }
 
-var serdeStructTmpl = template.Must(template.New("struct").Parse(`
+var serdeStructTmpl = template.Must(template.New("struct").Funcs(templateutils.FuncMap()).Parse(`
 type serdeStructEnum_{{ $.Name }} = int
 
 const (
 {{- range $idx, $field := .Fields }}
-	serdeStructEnum_{{ $.Name }}_{{ $field.Name }} {{ if eq $idx 0 }} serdeStructEnum_{{ $.Name }} = iota + 1 {{ end }}
+	{{ if not (and $field.IsSkipDeserialize $field.IsSkipSerialize) }}
+	serdeStructEnum_{{ $.Name }}_{{ $field.Name }}  serdeStructEnum_{{ $.Name }} = {{ add $idx 1 }}
+	{{ end }}
 {{- end }}
 )
 
-{{ if (index $.Flags "Deserialize") }}
+{{ if $.IsDeserialize }}
 type {{ $.FieldVisitor }} struct {
 	e serdeStructEnum_{{ $.Name }}
 
@@ -117,8 +129,10 @@ func serdeNewStructFieldVisitor_{{ $.Name }}() *{{ $.FieldVisitor }} {
 func (s *{{ $.FieldVisitor }}) VisitString(v string) (err error) {
 	switch v {
 {{- range $idx, $field := .Fields }}
+	{{ if not $field.IsSkipDeserialize }}
 	case "{{ $field.Name }}":
 		s.e = serdeStructEnum_{{ $.Name }}_{{ $field.Name }}
+	{{ end }}
 {{- end }}
 	default:
 		return errors.New("invalid field")
@@ -153,8 +167,10 @@ func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 		var v serde.Visitor
 		switch field.e {
 {{- range $idx, $field := .Fields }}
+	{{ if not $field.IsSkipDeserialize }}
 		case serdeStructEnum_{{ $.Name }}_{{ $field.Name }}:
 			v = {{ $field.NewVisitor }}(&s.v.{{ $field.Name }})
+	{{ end }}
 {{- end }}
 		default:
 			return errors.New("invalid field")
@@ -173,7 +189,7 @@ func (s *{{ $.Name }}) Deserialize(de serde.Deserializer) (err error) {
 }
 {{end}}
 
-{{ if (index $.Flags "Serialize") }}
+{{ if $.IsSerialize }}
 func (s *{{ $.Name }}) Serialize(ser serde.Serializer) (err error) {
 	st, err := ser.SerializeStruct("{{ $.Name }}", {{ $.Fields | len }})
 	if err != nil {
@@ -181,6 +197,7 @@ func (s *{{ $.Name }}) Serialize(ser serde.Serializer) (err error) {
 	}
 
 {{- range $idx, $field := .Fields }}
+	{{ if not $field.IsSkipSerialize }}
 	err = st.SerializeField(
 		serde.StringSerializer("{{ $field.Name }}"),
 		{{ $field.Serializer }}(s.{{ $field.Name }}),
@@ -188,6 +205,7 @@ func (s *{{ $.Name }}) Serialize(ser serde.Serializer) (err error) {
 	if err != nil {
 		return
 	}
+	{{ end }}
 {{- end }}
 	err = st.EndStruct()
 	if err != nil {
@@ -252,6 +270,24 @@ type structField struct {
 	Name  string
 	Flags map[string]string
 	serdeType
+}
+
+func (s structField) IsSkipSerialize() bool {
+	_, ok := s.Flags[TagSkipSerialize]
+	if ok {
+		return true
+	}
+	_, ok = s.Flags[TagSkip]
+	return ok
+}
+
+func (s structField) IsSkipDeserialize() bool {
+	_, ok := s.Flags[TagSkipDeserialize]
+	if ok {
+		return true
+	}
+	_, ok = s.Flags[TagSkip]
+	return ok
 }
 
 type structType string
