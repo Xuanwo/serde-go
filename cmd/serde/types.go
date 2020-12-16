@@ -106,6 +106,7 @@ var serdeStructTmpl = template.Must(template.New("struct").Funcs(templateutils.F
 type serdeStructEnum_{{ $.Name }} = int
 
 const (
+	serdeStructEnumSkip_{{ $.Name }} serdeStructEnum_{{ $.Name }} = 0
 {{- range $idx, $field := .Fields }}
 	{{ if not (and $field.IsSkipDeserialize $field.IsSkipSerialize) }}
 	serdeStructEnum_{{ $.Name }}_{{ $field.Name }}  serdeStructEnum_{{ $.Name }} = {{ add $idx 1 }}
@@ -132,6 +133,9 @@ func (s *{{ $.FieldVisitor }}) VisitString(v string) (err error) {
 	{{ if not $field.IsSkipDeserialize }}
 	case "{{ $field.Name }}":
 		s.e = serdeStructEnum_{{ $.Name }}_{{ $field.Name }}
+	{{ else }}
+	case "{{ $field.Name }}":
+		s.e = serdeStructEnumSkip_{{ $.Name }}
 	{{ end }}
 {{- end }}
 	default:
@@ -166,6 +170,8 @@ func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 
 		var v serde.Visitor
 		switch field.e {
+		case serdeStructEnumSkip_{{ $.Name }}:
+			v = serde.SkipVisitor{}
 {{- range $idx, $field := .Fields }}
 	{{ if not $field.IsSkipDeserialize }}
 		case serdeStructEnum_{{ $.Name }}_{{ $field.Name }}:

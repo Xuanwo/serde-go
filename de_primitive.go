@@ -182,3 +182,85 @@ func (vi BytesVisitor) VisitBytes(v []byte) (err error) {
 	*vi.v = v
 	return nil
 }
+
+type SkipVisitor struct{}
+
+func (s SkipVisitor) VisitNil() (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitBool(v bool) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitInt(v int) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitInt8(v int8) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitInt16(v int16) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitInt32(v int32) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitInt64(v int64) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitUint(v uint) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitUint8(v uint8) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitUint16(v uint16) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitUint32(v uint32) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitUint64(v uint64) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitFloat32(v float32) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitFloat64(v float64) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitComplex64(v complex64) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitComplex128(v complex128) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitString(v string) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitBytes(v []byte) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitSlice(sa SliceAccess) (err error) {
+	return
+}
+
+func (s SkipVisitor) VisitMap(m MapAccess) (err error) {
+	return
+}
