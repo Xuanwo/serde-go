@@ -107,7 +107,7 @@ type serdeStructEnum_{{ $.Name }} = int
 
 const (
 {{- range $idx, $field := .Fields }}
-	{{ if not $field.IsSkipDeserialize }}
+	{{ if not (and $field.IsSkipDeserialize $field.IsSkipSerialize) }}
 	serdeStructEnum_{{ $.Name }}_{{ $field.Name }}  serdeStructEnum_{{ $.Name }} = {{ add $idx 1 }}
 	{{ end }}
 {{- end }}
