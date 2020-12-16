@@ -117,4 +117,6 @@ import (
 
 	"github.com/Xuanwo/serde-go"
 )
+
+var _ = errors.New
 `))
