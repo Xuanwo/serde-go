@@ -680,6 +680,9 @@ func (vi RuneVisitor) VisitSlice(s SliceAccess) (err error) {
 func (vi RuneVisitor) VisitMap(m MapAccess) (err error) {
 	return NewInvalidTypeError(UnexpectedMap{}, vi)
 }
+func (vi SkipVisitor) String() string {
+	return "skip"
+}
 func (vi StringVisitor) VisitNil() (err error) {
 	return NewInvalidTypeError(UnexpectedNil{}, vi)
 }
