@@ -115,26 +115,27 @@ const (
 
 {{ if $.IsDeserialize }}
 type {{ $.FieldVisitor }} struct {
-	e serdeStructEnum_{{ $.Name }}
+	e *serdeStructEnum_{{ $.Name }}
 
 	serde.DummyVisitor
 }
 
-func serdeNewStructFieldVisitor_{{ $.Name }}() *{{ $.FieldVisitor }} {
-	return &serdeStructFieldVisitor_{{ $.Name }}{
+func serdeNewStructFieldVisitor_{{ $.Name }}(e *serdeStructEnum_{{ $.Name }}) {{ $.FieldVisitor }} {
+	return serdeStructFieldVisitor_{{ $.Name }}{
+		e: e,
 		DummyVisitor: serde.NewDummyVisitor("{{ $.Name }} Field"),
 	}
 }
 
-func (s *{{ $.FieldVisitor }}) VisitString(v string) (err error) {
+func (s {{ $.FieldVisitor }}) VisitString(v string) (err error) {
 	switch v {
 {{- range $idx, $field := .Fields }}
 	{{ if not $field.IsSkipDeserialize }}
 	case "{{ $field.Name }}":
-		s.e = serdeStructEnum_{{ $.Name }}_{{ $field.Name }}
+		*s.e = serdeStructEnum_{{ $.Name }}_{{ $field.Name }}
 	{{ else }}
 	case "{{ $field.Name }}":
-		s.e = serdeStructEnumSkip_{{ $.Name }}
+		*s.e = serdeStructEnumSkip_{{ $.Name }}
 	{{ end }}
 {{- end }}
 	default:
@@ -149,15 +150,16 @@ type {{ $.Visitor }} struct {
 	serde.DummyVisitor
 }
 
-func serdeNewStructVisitor_{{ $.Name }}(v *{{ $.Name }}) *{{ $.Visitor }} {
-	return &{{ $.Visitor }}{
+func serdeNewStructVisitor_{{ $.Name }}(v *{{ $.Name }}) {{ $.Visitor }} {
+	return {{ $.Visitor }}{
 		v: v,
 		DummyVisitor: serde.NewDummyVisitor("{{ $.Name }}"),
 	}
 }
 
-func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
-	field := serdeNewStructFieldVisitor_{{ $.Name }}()
+func (s {{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
+	var fieldValue serdeStructEnum_{{ $.Name }}
+	field := serdeNewStructFieldVisitor_{{ $.Name }}(&fieldValue)
 	for {
 		ok, err := m.NextKey(field)
 		if !ok {
@@ -168,7 +170,7 @@ func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 		}
 
 		var v serde.Visitor
-		switch field.e {
+		switch *field.e {
 		case serdeStructEnumSkip_{{ $.Name }}:
 			v = serde.SkipVisitor{}
 {{- range $idx, $field := .Fields }}
@@ -195,7 +197,7 @@ func (s *{{ $.Name }}) Deserialize(de serde.Deserializer) (err error) {
 {{end}}
 
 {{ if $.IsSerialize }}
-func (s *{{ $.Name }}) Serialize(ser serde.Serializer) (err error) {
+func (s {{ $.Name }}) Serialize(ser serde.Serializer) (err error) {
 	st, err := ser.SerializeStruct("{{ $.Name }}", {{ $.Fields | len }})
 	if err != nil {
 		return err
@@ -432,17 +434,17 @@ type {{ $.Visitor }} struct {
 	serde.DummyVisitor
 }
 
-func {{ $.NewVisitor }}(v *{{ $.TypeName }}) *{{ $.Visitor }} {
+func {{ $.NewVisitor }}(v *{{ $.TypeName }}) {{ $.Visitor }} {
 	if *v == nil {
 		*v = make({{ $.TypeName }})
 	}
-	return &{{ $.Visitor }}{
+	return {{ $.Visitor }}{
 		v: v,
 		DummyVisitor: serde.NewDummyVisitor("{{ $.TypeName }}"),
 	}
 }
 
-func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
+func (s {{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 	var field {{ $.Key.TypeName }}
 	var value {{ $.Value.TypeName }}
 	for {
@@ -545,14 +547,14 @@ type {{ $.Visitor }} struct {
 	serde.DummyVisitor
 }
 
-func {{ $.NewVisitor }}(v *{{ $.TypeName }}) *{{ $.Visitor }} {
-	return &{{ $.Visitor }}{
+func {{ $.NewVisitor }}(v *{{ $.TypeName }}) {{ $.Visitor }} {
+	return {{ $.Visitor }}{
 		v: v,
 		DummyVisitor: serde.NewDummyVisitor("{{ $.TypeName }}"),
 	}
 }
 
-func (s *{{ $.Visitor }}) VisitSlice(m serde.SliceAccess) (err error) {
+func (s {{ $.Visitor }}) VisitSlice(m serde.SliceAccess) (err error) {
 	var value {{ $.Element.Name }}
 
 	{{- if ne $.Length 0 }}
