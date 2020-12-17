@@ -47,10 +47,10 @@ func (s *serdeState) NeedGenerate() bool {
 	return len(s.todo) > 0
 }
 
-func newSerdeState() *serdeState {
+func newSerdeState(generated map[string]struct{}) *serdeState {
 	return &serdeState{
 		todo:      make([]serdeType, 0),
-		generated: make(map[string]struct{}),
+		generated: generated,
 	}
 }
 
@@ -615,7 +615,8 @@ type pointerType struct {
 }
 
 func (p pointerType) Name() string {
-	return fmt.Sprintf("%s", p.internal.Name())
+	// Add prefix "_" to represents pointer "*"
+	return fmt.Sprintf("_%s", p.internal.Name())
 }
 
 func (p pointerType) TypeName() string {

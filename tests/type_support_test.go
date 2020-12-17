@@ -7,13 +7,52 @@ import (
 )
 
 // serde: serialize,deserialize
-type TypeSupport struct {
-	vint int
-	vmap map[string]string
+type IntTypeSupport struct {
+	v int
 }
 
-func TestTypeSupportSerialize(t *testing.T) {
-	v := TypeSupport{}
+func TestIntTypeSupportSerialize(t *testing.T) {
+	v := IntTypeSupport{
+		v: 10,
+	}
+
+	x, err := SerializeToInterfaces(&v)
+	if err != nil {
+		t.Errorf("serialize: %v", x)
+	}
+
+	assert.EqualValues(t, []interface{}{
+		testMap(false),
+		"v", 10,
+		testMap(true),
+	}, x)
+}
+
+func TestIntTypeSupportDeserialize(t *testing.T) {
+	var v IntTypeSupport
+
+	in := []interface{}{
+		testMap(false),
+		"v", 10,
+		testMap(true),
+	}
+	err := DeserializeFromInterfaces(in, &v)
+	if err != nil {
+		t.Errorf("deserialize: %v", err)
+	}
+	assert.EqualValues(t, IntTypeSupport{
+		v: 10,
+	}, v)
+
+}
+
+// serde: serialize,deserialize
+type MapTypeSupport struct {
+	v map[int]int
+}
+
+func TestMapTypeSupportSerialize(t *testing.T) {
+	v := MapTypeSupport{}
 
 	x, err := SerializeToInterfaces(&v)
 	if err != nil {
@@ -21,64 +60,26 @@ func TestTypeSupportSerialize(t *testing.T) {
 	}
 	assert.EqualValues(t, []interface{}{
 		testMap(false),
-		"vint", 0,
-		"vmap", testMap(false), testMap(true),
-		testMap(true),
-	}, x)
-
-	v = TypeSupport{
-		vint: 10,
-		vmap: map[string]string{
-			"map_key_a": "map_value_a",
-		},
-	}
-
-	x, err = SerializeToInterfaces(&v)
-	if err != nil {
-		t.Errorf("serialize: %v", x)
-	}
-
-	assert.EqualValues(t, []interface{}{
-		testMap(false),
-		"vint", 10,
-		"vmap", testMap(false), "map_key_a", "map_value_a", testMap(true),
+		"v", testMap(false), testMap(true),
 		testMap(true),
 	}, x)
 }
 
-func TestTypeSupportDeserialize(t *testing.T) {
-	var v TypeSupport
+func TestMapTypeSupportDeserialize(t *testing.T) {
+	var v MapTypeSupport
 
 	in := []interface{}{
 		testMap(false),
-		"vint", 0,
-		"vmap", testMap(false), testMap(true),
+		"v", testMap(false), testMap(true),
 		testMap(true),
 	}
 	err := DeserializeFromInterfaces(in, &v)
 	if err != nil {
 		t.Errorf("deserialize: %v", err)
 	}
-	assert.EqualValues(t, TypeSupport{
-		// FIXME: vmap should be nil here, but serde-go is not supported for now.
-		vmap: make(map[string]string),
-	}, v)
-
-	in = []interface{}{
-		testMap(false),
-		"vint", 10,
-		"vmap", testMap(false), "map_key_a", "map_value_a", testMap(true),
-		testMap(true),
-	}
-	err = DeserializeFromInterfaces(in, &v)
-	if err != nil {
-		t.Errorf("deserialize: %v", err)
-	}
-	assert.EqualValues(t, TypeSupport{
-		vint: 10,
-		vmap: map[string]string{
-			"map_key_a": "map_value_a",
-		},
+	assert.EqualValues(t, MapTypeSupport{
+		// FIXME: v should be nil here, but serde-go is not supported for now.
+		v: make(map[int]int),
 	}, v)
 
 }

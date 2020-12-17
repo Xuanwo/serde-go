@@ -30,6 +30,8 @@ func main() {
 	// Errors could be stored in pkg.Errors, but we can ignore them fow now.
 
 	for _, pkg := range pkgs {
+		generated := make(map[string]struct{})
+
 		for _, file := range pkg.GoFiles {
 			content, err := ioutil.ReadFile(file)
 			if err != nil {
@@ -41,7 +43,7 @@ func main() {
 				log.Fatalf("parse file %s: %v", file, err)
 			}
 
-			state := newSerdeState()
+			state := newSerdeState(generated)
 
 			for _, v := range f.Decls {
 				parse(state, v)
@@ -64,10 +66,15 @@ func main() {
 			}
 
 			for _, v := range state.todo {
+				if state.IsGenerated(v) {
+					continue
+				}
+
 				_, err = generateFile.WriteString(v.Generate())
 				if err != nil {
 					log.Fatalf("generate: %v", err)
 				}
+				state.Generated(v)
 			}
 		}
 	}
