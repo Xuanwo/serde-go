@@ -92,6 +92,12 @@ func (s *serdeStruct) ParseFields(state *serdeState) {
 		for _, name := range v.Names {
 			st := parseSerdeType(state, v.Type)
 
+			// Returning serdeType == nil means we should ignore it.
+			if st == nil {
+				log.Printf("Ignore strcut %s filed %s", s.Name(), name)
+				continue
+			}
+
 			s.Fields = append(s.Fields, structField{
 				Name:      name.Name,
 				Flags:     parseTagsFromStructTag(v.Tag),
@@ -271,6 +277,9 @@ func parseSerdeType(state *serdeState, t ast.Expr) (st serdeType) {
 		return st
 	case *ast.FuncType, *ast.ChanType:
 		// Ignore golang runtime types.
+		return nil
+	case *ast.SelectorExpr:
+		log.Printf("%s: Extrenal type support is under development, ignore", ty.Sel.Name)
 		return nil
 	default:
 		log.Panicf("Expr %#+v is not supported for now", ty)

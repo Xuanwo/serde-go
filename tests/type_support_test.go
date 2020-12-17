@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -168,4 +169,9 @@ func TestMapPointerIntTypeSupportDeserialize(t *testing.T) {
 			1: {v: 10},
 		},
 	}, v)
+}
+
+// serde: serialize,deserialize
+type ExternalTypeSupport struct {
+	v sync.RWMutex
 }
