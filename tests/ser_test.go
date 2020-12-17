@@ -4,8 +4,6 @@ import (
 	"github.com/Xuanwo/serde-go"
 )
 
-//go:generate go run -tags tools github.com/Xuanwo/serde-go/cmd/serde ./...
-
 func SerializeToInterfaces(v serde.Serializable) ([]interface{}, error) {
 	ser := &Ser{v: make([]interface{}, 0)}
 
