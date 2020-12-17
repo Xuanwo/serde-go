@@ -14,7 +14,11 @@ import (
 )
 
 type serdeType interface {
+	// Name is the display name, follows serde name style.
 	Name() string
+	// TypeName is the type name.
+	TypeName() string
+
 	Visitor() string
 	NewVisitor() string
 	Serializer() string
@@ -86,12 +90,7 @@ func (s serdeStruct) NeedGenerate() bool {
 func (s *serdeStruct) ParseFields(state *serdeState) {
 	for _, v := range s.decl.Fields.List {
 		for _, name := range v.Names {
-			st := parseSerdeType(v.Type)
-
-			switch st.(type) {
-			case mapType, sliceType, pointerType:
-				state.AppendTodo(st)
-			}
+			st := parseSerdeType(state, v.Type)
 
 			s.Fields = append(s.Fields, structField{
 				Name:      name.Name,
@@ -233,7 +232,7 @@ func (s serdeStruct) Generate() string {
 	return buf.String()
 }
 
-func parseSerdeType(t ast.Expr) serdeType {
+func parseSerdeType(state *serdeState, t ast.Expr) (st serdeType) {
 	switch ty := t.(type) {
 	case *ast.Ident:
 		if isBasicType(ty.Name) {
@@ -242,14 +241,16 @@ func parseSerdeType(t ast.Expr) serdeType {
 			return structType(ty.Name)
 		}
 	case *ast.MapType:
-		return mapType{
-			key:   parseSerdeType(ty.Key),
-			value: parseSerdeType(ty.Value),
+		st = mapType{
+			key:   parseSerdeType(state, ty.Key),
+			value: parseSerdeType(state, ty.Value),
 		}
+		state.AppendTodo(st)
+		return st
 	case *ast.ArrayType:
 		st := sliceType{
 			length:  0,
-			element: parseSerdeType(ty.Elt),
+			element: parseSerdeType(state, ty.Elt),
 		}
 
 		if l, ok := ty.Len.(*ast.BasicLit); ok {
@@ -260,9 +261,12 @@ func parseSerdeType(t ast.Expr) serdeType {
 
 			st.length = int(stl)
 		}
+		state.AppendTodo(st)
 		return st
 	case *ast.StarExpr:
-		return pointerType{internal: parseSerdeType(ty.X)}
+		st = pointerType{internal: parseSerdeType(state, ty.X)}
+		state.AppendTodo(st)
+		return st
 	case *ast.FuncType, *ast.ChanType:
 		// Ignore golang runtime types.
 		return nil
@@ -299,6 +303,10 @@ func (s structField) IsSkipDeserialize() bool {
 type structType string
 
 func (s structType) Name() string {
+	return string(s)
+}
+
+func (s structType) TypeName() string {
 	return string(s)
 }
 
@@ -402,7 +410,7 @@ func (m mapType) Name() string {
 }
 
 func (m mapType) TypeName() string {
-	return fmt.Sprintf("map[%s]%s", m.key.Name(), m.value.Name())
+	return fmt.Sprintf("map[%s]%s", m.key.TypeName(), m.value.TypeName())
 }
 
 func (m mapType) Visitor() string {
@@ -435,8 +443,8 @@ func {{ $.NewVisitor }}(v *{{ $.TypeName }}) *{{ $.Visitor }} {
 }
 
 func (s *{{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
-	var field {{ $.Key.Name }}
-	var value {{ $.Value.Name }}
+	var field {{ $.Key.TypeName }}
+	var value {{ $.Value.TypeName }}
 	for {
 		ok, err := m.NextKey({{$.Key.NewVisitor}}(&field))
 		if !ok {
@@ -505,9 +513,9 @@ func (s sliceType) Name() string {
 
 func (s sliceType) TypeName() string {
 	if s.length != 0 {
-		return fmt.Sprintf("[%d]%s", s.length, s.element.Name())
+		return fmt.Sprintf("[%d]%s", s.length, s.element.TypeName())
 	}
-	return fmt.Sprintf("[]%s", s.element.Name())
+	return fmt.Sprintf("[]%s", s.element.TypeName())
 }
 
 func (s sliceType) Length() int {
@@ -611,7 +619,7 @@ func (p pointerType) Name() string {
 }
 
 func (p pointerType) TypeName() string {
-	return fmt.Sprintf("*%s", p.internal.Name())
+	return fmt.Sprintf("*%s", p.internal.TypeName())
 }
 
 func (p pointerType) Internal() serdeType {

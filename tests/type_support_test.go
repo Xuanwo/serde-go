@@ -82,3 +82,47 @@ func TestTypeSupportDeserialize(t *testing.T) {
 	}, v)
 
 }
+
+// serde: serialize,deserialize
+type MapPointerTypeSupport struct {
+	v map[int]*int
+}
+
+func TestMapPointerTypeSupportSerialize(t *testing.T) {
+	vint := 10
+	v := MapPointerTypeSupport{
+		v: map[int]*int{
+			1: &vint,
+		},
+	}
+
+	x, err := SerializeToInterfaces(&v)
+	if err != nil {
+		t.Errorf("serialize: %v", x)
+	}
+	assert.EqualValues(t, []interface{}{
+		testMap(false),
+		"v", testMap(false), 1, 10, testMap(true),
+		testMap(true),
+	}, x)
+}
+
+func TestMapPointerTypeSupportDeserialize(t *testing.T) {
+	var v MapPointerTypeSupport
+
+	in := []interface{}{
+		testMap(false),
+		"v", testMap(false), 1, 10, testMap(true),
+		testMap(true),
+	}
+	err := DeserializeFromInterfaces(in, &v)
+	if err != nil {
+		t.Errorf("deserialize: %v", err)
+	}
+	vint := 10
+	assert.EqualValues(t, MapPointerTypeSupport{
+		v: map[int]*int{
+			1: &vint,
+		},
+	}, v)
+}
