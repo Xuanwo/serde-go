@@ -7,6 +7,7 @@ type Deserializable interface {
 type Deserializer interface {
 	DeserializeAny(v Visitor) (err error)
 
+	DeserializeNil(v Visitor) (err error)
 	DeserializeBool(v Visitor) (err error)
 	DeserializeInt(v Visitor) (err error)
 	DeserializeInt8(v Visitor) (err error)
