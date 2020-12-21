@@ -163,6 +163,10 @@ func serdeNewStructVisitor_{{ $.Name }}(v *{{ $.Name }}) {{ $.Visitor }} {
 	}
 }
 
+func (s {{ $.Visitor }}) VisitNil() (err error) {
+	return nil
+}
+
 func (s {{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 	var fieldValue serdeStructEnum_{{ $.Name }}
 	field := serdeNewStructFieldVisitor_{{ $.Name }}(&fieldValue)
@@ -470,6 +474,11 @@ func {{ $.NewVisitor }}(v *{{ $.TypeName }}) {{ $.Visitor }} {
 	}
 }
 
+func (s {{ $.Visitor }}) VisitNil() (err error) {
+	*s.v = nil
+	return nil
+}
+
 func (s {{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 	var field {{ $.Key.TypeName }}
 	var value {{ $.Value.TypeName }}
@@ -585,6 +594,13 @@ func {{ $.NewVisitor }}(v *{{ $.TypeName }}) {{ $.Visitor }} {
 		v: v,
 		DummyVisitor: serde.NewDummyVisitor("{{ $.TypeName }}"),
 	}
+}
+
+func (s {{ $.Visitor }}) VisitNil() (err error) {
+	{{ if eq $.Length 0 }}
+	*s.v = nil
+	{{ end }}
+	return nil
 }
 
 func (s {{ $.Visitor }}) VisitSlice(m serde.SliceAccess) (err error) {
