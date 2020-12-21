@@ -77,11 +77,18 @@ func (d *De) DeserializeAny(v serde.Visitor) (err error) {
 		err = d.DeserializeSlice(v)
 	case testMap:
 		err = d.DeserializeMap(v)
+	case nil:
+		err = d.DeserializeNil(v)
 	default:
 		err = fmt.Errorf("not supported type: %#v", i)
 	}
 
 	return err
+}
+
+func (d *De) DeserializeNil(v serde.Visitor) (err error) {
+	d.next()
+	return v.VisitNil()
 }
 
 func (d *De) DeserializeBool(v serde.Visitor) (err error) {

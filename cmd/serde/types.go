@@ -329,6 +329,10 @@ func (s structType) Visitor() string {
 	return fmt.Sprintf("serdeStructVisitor_%s", s)
 }
 
+func (s structType) VisitorTypeName() string {
+	return s.Visitor()
+}
+
 func (s structType) NewVisitor() string {
 	return fmt.Sprintf("serdeNewStructVisitor_%s", s)
 }
@@ -370,6 +374,18 @@ func (bt basicType) Visitor() string {
 		"float32", "float64", "complex64", "complex128",
 		"rune", "string", "byte", "bytes":
 		return fmt.Sprintf("serde.%sVisitor", templateutils.ToUpperFirst(string(bt)))
+	default:
+		panic(fmt.Errorf("%s is not a basic type", bt))
+	}
+}
+
+func (bt basicType) VisitorTypeName() string {
+	switch bt {
+	case "bool", "int", "int8", "int16", "int32", "int64",
+		"uint", "uint8", "uint16", "uint32", "uint64",
+		"float32", "float64", "complex64", "complex128",
+		"rune", "string", "byte", "bytes":
+		return fmt.Sprintf("%sVisitor", templateutils.ToUpperFirst(string(bt)))
 	default:
 		panic(fmt.Errorf("%s is not a basic type", bt))
 	}
@@ -428,6 +444,10 @@ func (m mapType) Visitor() string {
 	return fmt.Sprintf("serdeMapVisitor_%s", m.Name())
 }
 
+func (m mapType) VisitorTypeName() string {
+	return m.Visitor()
+}
+
 func (m mapType) NewVisitor() string {
 	return fmt.Sprintf("serdeNewMapVisitor_%s", m.Name())
 }
@@ -444,9 +464,6 @@ type {{ $.Visitor }} struct {
 }
 
 func {{ $.NewVisitor }}(v *{{ $.TypeName }}) {{ $.Visitor }} {
-	if *v == nil {
-		*v = make({{ $.TypeName }})
-	}
 	return {{ $.Visitor }}{
 		v: v,
 		DummyVisitor: serde.NewDummyVisitor("{{ $.TypeName }}"),
@@ -467,6 +484,9 @@ func (s {{ $.Visitor }}) VisitMap(m serde.MapAccess) (err error) {
 		err = m.NextValue({{$.Value.NewVisitor}}(&value))
 		if err != nil {
 			return err
+		}
+		if *s.v == nil {
+			*s.v = make({{ $.TypeName }})
 		}
 		(*s.v)[field] = value
 	}
@@ -539,6 +559,10 @@ func (s sliceType) Element() serdeType {
 
 func (s sliceType) Visitor() string {
 	return fmt.Sprintf("serdeSliceVisitor_%s", s.Name())
+}
+
+func (s sliceType) VisitorTypeName() string {
+	return s.Visitor()
 }
 
 func (s sliceType) NewVisitor() string {
@@ -642,6 +666,10 @@ func (p pointerType) Visitor() string {
 	return fmt.Sprintf("serdePointerVisitor_%s", p.Name())
 }
 
+func (p pointerType) VisitorTypeName() string {
+	return p.Visitor()
+}
+
 func (p pointerType) NewVisitor() string {
 	return fmt.Sprintf("serdeNewPointerVisitor_%s", p.Name())
 }
@@ -652,14 +680,22 @@ func (p pointerType) Serializer() string {
 
 var serdePointerTmpl = template.Must(template.New("pointer").Parse(`
 type {{ $.Visitor }} struct {
+	v *{{ $.TypeName }}
+
 	{{ $.Internal.Visitor }}
 }
 
+func (v {{ $.Visitor }}) VisitNil() (err error) {
+	*v.v = nil
+	return nil
+}
+
 func {{ $.NewVisitor }}(v *{{ $.TypeName }}) {{ $.Visitor }} {
-	// FIXME: nil is not handled correctly
 	var tv {{ $.Internal.TypeName }}
 	*v = &tv
-	return {{ $.Visitor }}{ {{ $.Internal.NewVisitor }}(*v) }
+	vis := {{ $.Visitor }}{v: v}
+	vis.{{ $.Internal.VisitorTypeName }} = {{ $.Internal.NewVisitor }}(*vis.v)
+	return vis
 }
 
 func {{ $.Serializer }}(v {{ $.TypeName }}) serde.Serializable {
