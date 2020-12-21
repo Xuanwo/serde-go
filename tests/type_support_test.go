@@ -174,6 +174,108 @@ func TestMapTypeSupportDeserialize(t *testing.T) {
 }
 
 // serde: serialize,deserialize
+type SliceTypeSupport struct {
+	v []int
+}
+
+func TestSliceTypeSupportSerialize(t *testing.T) {
+	v := SliceTypeSupport{}
+
+	x, err := SerializeToInterfaces(&v)
+	if err != nil {
+		t.Errorf("serialize: %v", x)
+	}
+	assert.EqualValues(t, []interface{}{
+		testMap(false),
+		"v", testSlice(false), testSlice(true),
+		testMap(true),
+	}, x)
+}
+
+func TestSliceTypeSupportDeserialize(t *testing.T) {
+	var v SliceTypeSupport
+
+	t.Run("empty slice", func(t *testing.T) {
+		in := []interface{}{
+			testMap(false),
+			"v", testSlice(false), testSlice(true),
+			testMap(true),
+		}
+		err := DeserializeFromInterfaces(in, &v)
+		if err != nil {
+			t.Errorf("deserialize: %v", err)
+		}
+		assert.EqualValues(t, SliceTypeSupport{}, v)
+	})
+
+	t.Run("non empty slice", func(t *testing.T) {
+		in := []interface{}{
+			testMap(false),
+			"v", testSlice(false), 1, 2, testSlice(true),
+			testMap(true),
+		}
+		err := DeserializeFromInterfaces(in, &v)
+		if err != nil {
+			t.Errorf("deserialize: %v", err)
+		}
+		assert.EqualValues(t, SliceTypeSupport{
+			v: []int{1, 2},
+		}, v)
+	})
+}
+
+// serde: serialize,deserialize
+type ArrayTypeSupport struct {
+	v [2]int
+}
+
+func TestArrayTypeSupportSerialize(t *testing.T) {
+	v := ArrayTypeSupport{}
+
+	x, err := SerializeToInterfaces(&v)
+	if err != nil {
+		t.Errorf("serialize: %v", x)
+	}
+	assert.EqualValues(t, []interface{}{
+		testMap(false),
+		"v", testSlice(false), 0, 0, testSlice(true),
+		testMap(true),
+	}, x)
+}
+
+func TestArrayTypeSupportDeserialize(t *testing.T) {
+	var v ArrayTypeSupport
+
+	t.Run("empty array", func(t *testing.T) {
+		in := []interface{}{
+			testMap(false),
+			"v", testSlice(false), 0, 0, testSlice(true),
+			testMap(true),
+		}
+		err := DeserializeFromInterfaces(in, &v)
+		if err != nil {
+			t.Errorf("deserialize: %v", err)
+		}
+		assert.EqualValues(t, ArrayTypeSupport{}, v)
+	})
+
+	t.Run("non empty array", func(t *testing.T) {
+		in := []interface{}{
+			testMap(false),
+			"v", testSlice(false), 1, 2, testSlice(true),
+			testMap(true),
+		}
+		err := DeserializeFromInterfaces(in, &v)
+		if err != nil {
+			t.Errorf("deserialize: %v", err)
+		}
+		assert.EqualValues(t, ArrayTypeSupport{
+			v: [2]int{1, 2},
+		}, v)
+	})
+}
+
+// serde: serialize,deserialize
 type MapPointerTypeSupport struct {
 	v map[int]*int
 }
