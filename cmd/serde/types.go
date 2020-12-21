@@ -81,6 +81,28 @@ func (s serdeStruct) IsDeserialize() bool {
 	return hasDeserialize
 }
 
+func (s serdeStruct) SerializeFieldsLength() int {
+	l := 0
+	for _, v := range s.Fields {
+		if v.IsSkipSerialize() {
+			continue
+		}
+		l++
+	}
+	return l
+}
+
+func (s serdeStruct) DeserializeFieldsLength() int {
+	l := 0
+	for _, v := range s.Fields {
+		if v.IsSkipDeserialize() {
+			continue
+		}
+		l++
+	}
+	return l
+}
+
 func (s serdeStruct) NeedGenerate() bool {
 	_, hasDeserialize := s.Flags[TagDeserialize]
 	_, hasSerialize := s.Flags[TagSerialize]
@@ -208,7 +230,7 @@ func (s *{{ $.Name }}) Deserialize(de serde.Deserializer) (err error) {
 
 {{ if $.IsSerialize }}
 func (s {{ $.Name }}) Serialize(ser serde.Serializer) (err error) {
-	st, err := ser.SerializeStruct("{{ $.Name }}", {{ $.Fields | len }})
+	st, err := ser.SerializeStruct("{{ $.Name }}", {{ $.SerializeFieldsLength }})
 	if err != nil {
 		return err
 	}
